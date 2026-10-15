@@ -8,7 +8,9 @@
     "start": "node dist/src/index.js",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test-key": "tsx src/test-key.ts"
+    "test-key": "tsx src/test-key.ts",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "inbox": "tsx src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +18,8 @@
   "type": "module",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
-    "dotenv": "^18.0.7"
+    "dotenv": "^18.0.7",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",

@@ -25,6 +25,8 @@ ANTHROPIC_API_KEY=your-claude-key
 
 | Command | What it does |
 |---|---|
+| `npm run inbox` | Groups and drafts replies for `data/messages.json` (or pass a path: `npm run inbox -- path/to/file.json`) |
+| `npm test` | Runs the tests (no real AI calls) |
 | `npm run test-key` | Checks that your Claude key works |
 | `npm run dev` | Runs `src/index.ts` and restarts on save |
 | `npm run build` | Compiles TypeScript to `dist/` |
