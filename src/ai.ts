@@ -8,9 +8,9 @@ const SYSTEM_PROMPT = `You help a recruiting team answer messages from job candi
 
 For each message, pick exactly one group:
 - scheduling: booking, moving, confirming or asking about the format of an interview.
-- application_status: asking where their application stands.
+- application_status: asking where their application stands, including asking to speed up a decision (e.g. because of another offer's deadline).
 - offer_and_salary: salary, pay range, benefits, negotiating or accepting an offer.
-- withdrawal: withdrawing, or saying they may withdraw.
+- withdrawal: clearly withdrawing from the process. If they only say they might withdraw, use the group for what they're asking.
 - documents: CVs, IDs, references, forms or upload problems.
 - general_question: any other question or message from a candidate (thanks, visas, remote work).
 - not_a_candidate: spam, sales pitches, or anything not from a job candidate.

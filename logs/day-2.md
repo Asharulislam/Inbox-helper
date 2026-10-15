@@ -22,7 +22,9 @@ Build the first working prototype end to end: a file of candidate messages goes 
 1. **A draft claimed an action had already been done (m04).** Lucas asked to withdraw, and the draft said "We **have removed** you from the QA Engineer process." Nobody had. A recruiter skimming 20 drafts could send a false statement. The prompt already said "never invent facts", but the model didn't treat an action as a fact.
    - Fix: added a prompt rule: "Never say an action has already been done (removed, updated, scheduled, sent). Say it will be done." Re-ran all 20 messages: m04 now says "We **will remove** you…", a search across all drafts found no other past-tense action claims, and the group counts were unchanged.
 2. **m17 put in the wrong group.** Nina is asking to speed up the decision because of another offer's deadline, but she was grouped as `withdrawal`. Claude's own reason contradicts itself ("the main need is a timeline answer… so withdrawal is chosen"). After the fix in #1, her draft also says "ideally before your Friday deadline", a soft promise about timing.
-   - Not fixed yet.
+   - Cause: my own prompt. The `withdrawal` definition said "withdrawing, or saying they may withdraw", which describes Nina's message exactly, so the model followed the rule it was given.
+   - Fix: narrowed `withdrawal` to "clearly withdrawing" and added "asking to speed up a decision" to `application_status`. Re-ran all 20: Nina moved to `application_status`, Lucas (m04) stayed in `withdrawal`, and the other 19 messages kept the same group.
+   - Still open: her draft says "ideally before your Friday deadline", a soft promise about timing.
 3. **The prompt-injection message (m14) gets no reply and no flag.** Claude correctly refused to follow the instructions, but labelled Raj `not_a_candidate`. He may be a real candidate, and a human should see a flag rather than a silent skip.
    - Not fixed yet.
 4. **Minor:** draft formatting is inconsistent (the sign-off is sometimes on the same line), and one draft (m15) has no greeting.
@@ -38,16 +40,15 @@ Build the first working prototype end to end: a file of candidate messages goes 
 
 ## Unlearned today
 
-<!-- Copy this block once per habit. Write it in your own words, only what really happened. -->
+### Verifying data by hand instead of writing tests
 
-### <short name of the habit>
-
-- **Old habit:** what I would normally have done.
-- **What I did instead:** the AI-first way I tried.
-- **What happened:** did it work? What did I have to check or fix?
+- **Old habit:** checking that the data and code work by running the program and looking at the output myself, and skipping automated tests.
+- **What I did instead:** had the AI write automated tests that verify the data and the logic: the sample file loads and has all its messages, a file with missing fields is rejected, every message gets processed, one failing message doesn't stop the run, and results are grouped correctly. The tests use a fake AI, so they run in about 2 seconds with no API cost.
+- **What happened:** all 6 tests pass. But the tests only check the code, not the quality of the drafts. The two real problems today (m04's false claim and m17's wrong group) were found by reading the output, not by the tests. Automated tests and reading the AI's output are both needed.
 
 ## Plan for Day 3
 
-- Fix m17 (wrong group) and m14 (injection attempt should be flagged for a human, not skipped).
+- Fix m14 (injection attempt should be flagged for a human, not skipped).
+- Consider an "urgent" flag so time-sensitive messages like m17 are reviewed first.
 - Build the human review step: approve, edit or reject each draft, and save the decisions.
 - Add tests for the review step.
