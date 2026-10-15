@@ -29,14 +29,12 @@ The Gemini free tier was unreliable for this project: a retired model (404), "hi
 ## AI usage
 
 - Used Claude Code to set up the project, TypeScript config and `.gitignore`, and to diagnose the hang.
-- <!-- TODO: your own notes, e.g. where you checked the AI's output or had to correct it -->
 
-## Old habits I noticed
+## Unlearned today
 
-<!-- TODO: in your own words. Any moment you started doing something the old way (googling, writing code by hand, staring at the error) and what you did instead. -->
+### Starting with the UI or the backend architecture
 
-## Plan for Day 2
+- **Old habit:** on day 1 of a project I usually start by planning the UI, or by designing the backend and the database.
+- **What I did instead:** I skipped UI, backend and database design and aimed straight for a basic working prototype of the inbox helper.
+- **What happened:** by the end of Day 1 I had a working AI call from code and no UI or database at all. The full prototype (messages in, groups and drafts out) wasn't finished on Day 1 and carries over to Day 2.
 
-- Generate realistic, messy sample candidate messages.
-- Decide the groups and the input format (see open questions in `directive.md`).
-- Build `src/ai.ts` with retry logic, and the first grouping step with tests.
