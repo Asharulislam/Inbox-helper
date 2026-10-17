@@ -21,7 +21,8 @@ for (const [group, items] of groupResults(results)) {
   console.log(`=== ${group} (${items.length}) ===\n`);
   for (const r of items) {
     if (!r.ok) continue;
-    console.log(`[${r.message.id}] ${r.message.from} — ${r.message.subject || "(no subject)"}`);
+    const warning = r.triage.suspicious ? "  ⚠️ SUSPICIOUS: check before replying" : "";
+    console.log(`[${r.message.id}] ${r.message.from} — ${r.message.subject || "(no subject)"}${warning}`);
     console.log(`Why: ${r.triage.reason}`);
     console.log(r.triage.draft ? `Draft:\n${r.triage.draft}` : "Draft: (no reply)");
     console.log();
