@@ -2,7 +2,7 @@ import "dotenv/config";
 import { triageMessage } from "./ai/triage.js";
 import { groupResults, loadMessages, processInbox } from "./inbox/process.js";
 
-const path = process.argv[2] ?? "data/messages.txt";
+const path = process.argv[2] ?? "../data/messages.txt";
 
 if (!process.env.ANTHROPIC_API_KEY) {
   console.error("ANTHROPIC_API_KEY is not set. Add it to .env.");

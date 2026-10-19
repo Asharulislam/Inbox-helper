@@ -66,7 +66,3 @@ None of the attacks worked. Two weak spots:
 - **Old habit:** normally I don't think about security in my projects.
 - **What I did instead:** I focused on security: I treated m14 (a message trying to trick the AI into confirming a $250,000 offer) as a real problem to fix, not just a funny test case. The tool now marks such messages ⚠️ SUSPICIOUS for the reviewer, and the draft confirms nothing.
 - **What happened:** the AI never followed the injected instructions, thanks to the rule that the candidate's message is only data. But the first version hid the attempt by silently skipping the message. Now it's visible to the human, which is safer: the person who decides can see that someone tried to manipulate the system.
-
-## Plan for Day 4
-
-- Build the human review step (approve, edit or reject each draft).

@@ -54,7 +54,7 @@ test("handles Windows line endings", () => {
 });
 
 test("parses the sample inbox.txt into 24 messages", async () => {
-  const messages = parseTextMessages(await readFile("data/inbox.txt", "utf8"));
+  const messages = parseTextMessages(await readFile("../data/inbox.txt", "utf8"));
   assert.equal(messages.length, 24);
   assert.ok(messages.every((m) => m.body.length > 0));
   assert.equal(messages.at(-1)!.subject, "no sender");
