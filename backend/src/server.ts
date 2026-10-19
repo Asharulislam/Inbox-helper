@@ -7,9 +7,6 @@ import { parseTextMessages } from "./inbox/parse-text.js";
 import { validateInbox } from "./inbox/validate.js";
 
 const PORT = Number(process.env.PORT ?? 3000);
-// The frontend's address when it's hosted elsewhere (e.g. https://your-site.netlify.app).
-// Not needed locally, where the page is served by this server.
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN;
 
 if (!process.env.ANTHROPIC_API_KEY) {
   console.error("ANTHROPIC_API_KEY is not set. Add it to .env.");
@@ -46,17 +43,10 @@ async function handleProcess(req: IncomingMessage, res: ServerResponse): Promise
   sendJson(res, 200, { drafts, failed });
 }
 
+// The page and the API are served from the same address, so no CORS setup is needed.
 const server = createServer(async (req, res) => {
-  if (ALLOWED_ORIGIN) {
-    res.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  }
-
   try {
-    if (req.method === "OPTIONS") {
-      res.writeHead(204).end();
-    } else if (req.method === "GET" && req.url === "/api/health") {
+    if (req.method === "GET" && req.url === "/api/health") {
       sendJson(res, 200, { ok: true });
     } else if (req.method === "POST" && req.url === "/api/process") {
       await handleProcess(req, res);
