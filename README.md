@@ -129,9 +129,7 @@ One Render web service hosts both the API and the page:
 | Start Command | `npm start` |
 | Environment variable | `ANTHROPIC_API_KEY` |
 
-The server serves `frontend/index.html` at `/`. Because the Root Directory is `backend`, a change only in `frontend/` doesn't redeploy automatically. Use **Manual Deploy → Deploy latest commit** in Render.
-
-To host the page elsewhere (e.g. Netlify), set `DEPLOYED_BACKEND` in `frontend/index.html` to the backend's URL and set `ALLOWED_ORIGIN` on the server to the page's URL.
+The server serves `frontend/index.html` at `/`, so the page and the API share one address and no CORS setup is needed. Because the Root Directory is `backend`, a change only in `frontend/` doesn't redeploy automatically. Use **Manual Deploy → Deploy latest commit** in Render.
 
 The live demo has no per-user rate limit. Its cost is capped by the prepaid balance on the Claude account.
 
