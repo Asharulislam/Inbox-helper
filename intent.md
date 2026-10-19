@@ -26,7 +26,6 @@ A recruiter or hiring coordinator with a backlog of candidate messages who wants
 ## Out of scope
 
 - Actually sending email or connecting to a real inbox.
-- A web UI. The review step happens in the terminal.
 
 ## How I will know it works
 
