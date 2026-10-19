@@ -144,8 +144,7 @@
   </main>
 
   <script>
-    // Where the backend lives. Locally the page is served by the backend itself, so no address is needed.
-    // When the page is hosted elsewhere (e.g. Netlify), it calls the deployed backend.
+
     const DEPLOYED_BACKEND = "https://inbox-helper.onrender.com";
     const isLocal = ["localhost", "127.0.0.1"].includes(location.hostname);
     const API_BASE = isLocal ? "" : DEPLOYED_BACKEND;
