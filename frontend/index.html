@@ -144,9 +144,11 @@
   </main>
 
   <script>
-    // Where the backend lives. Empty means "the same server that served this page" (local use).
-    // When the page is hosted separately (e.g. on Netlify), set this to the backend's URL.
-    const API_BASE = "";
+    // Where the backend lives. Locally the page is served by the backend itself, so no address is needed.
+    // When the page is hosted elsewhere (e.g. Netlify), it calls the deployed backend.
+    const DEPLOYED_BACKEND = "https://YOUR-RENDER-APP.onrender.com";
+    const isLocal = ["localhost", "127.0.0.1"].includes(location.hostname);
+    const API_BASE = isLocal ? "" : DEPLOYED_BACKEND;
 
     const GROUP_LABELS = {
       scheduling: "Scheduling",
