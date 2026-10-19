@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { formatMessage } from "../src/ai.js";
-import { groupResults, loadMessages, processInbox, type TriageFn } from "../src/inbox.js";
+import { formatMessage } from "../src/ai/prompt.js";
+import { groupResults, loadMessages, processInbox, type TriageFn } from "../src/inbox/process.js";
 import type { Message } from "../src/types.js";
 
 const msg = (id: string, body = "hello"): Message => ({ id, from: "a@example.com", subject: "s", body });
@@ -49,16 +49,17 @@ test("groupResults groups by intent and leaves out failures and empty groups", a
   assert.deepEqual(grouped.get("scheduling")!.map((r) => r.message.id), ["1", "3"]);
 });
 
-test("loadMessages rejects a file with missing fields", async () => {
+test("loadMessages rejects a file that isn't a messages file", async () => {
   const dir = await mkdtemp(join(tmpdir(), "inbox-test-"));
-  const file = join(dir, "bad.json");
-  await writeFile(file, JSON.stringify([{ id: "1", body: "no from or subject" }]));
-  await assert.rejects(loadMessages(file));
+  const file = join(dir, "notes.txt");
+  await writeFile(file, "2 eggs\n1 cup of flour\nmix well");
+  await assert.rejects(loadMessages(file), /doesn't look like a messages file/);
 });
 
-test("loadMessages reads the sample data", async () => {
-  const messages = await loadMessages("data/messages.json");
-  assert.ok(messages.length >= 20);
+test("loadMessages reads every sample file", async () => {
+  assert.equal((await loadMessages("data/messages.txt")).length, 20);
+  assert.equal((await loadMessages("data/attacks.txt")).length, 8);
+  assert.equal((await loadMessages("data/inbox.txt")).length, 24);
 });
 
 test("formatMessage wraps the message in tags and marks empty fields", () => {

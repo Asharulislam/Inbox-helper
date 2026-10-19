@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inbox Helper</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --card: #ffffff;
+      --text: #1d2330;
+      --muted: #667085;
+      --border: #e3e6eb;
+      --accent: #3b5bdb;
+      --warn-bg: #fff4e5;
+      --warn-text: #9a4a00;
+      --error: #c92a2a;
+      --draft-bg: #f1f4ff;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #14171c;
+        --card: #1d2128;
+        --text: #e6e8eb;
+        --muted: #98a2b3;
+        --border: #2c323c;
+        --accent: #7b93ff;
+        --warn-bg: #3a2a12;
+        --warn-text: #ffc078;
+        --error: #ff8787;
+        --draft-bg: #1f2638;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    main { max-width: 860px; margin: 0 auto; padding: 32px 16px 64px; }
+    h1 { margin: 0 0 4px; font-size: 26px; }
+    .subtitle { margin: 0 0 24px; color: var(--muted); }
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .upload { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    .upload input[type="file"] { flex: 1 1 240px; min-width: 0; }
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    button.link {
+      background: none;
+      color: var(--accent);
+      padding: 0;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+    .hint { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+    .status { margin: 20px 0; display: flex; align-items: center; gap: 12px; }
+    .status.error { color: var(--error); font-weight: 600; }
+    .spinner {
+      width: 20px; height: 20px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .summary { margin: 24px 0 8px; font-weight: 600; }
+    .group h2 {
+      margin: 32px 0 12px;
+      font-size: 18px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .count {
+      background: var(--border);
+      border-radius: 999px;
+      padding: 0 10px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .card { margin-bottom: 12px; }
+    .card-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+    .sender { font-weight: 600; overflow-wrap: anywhere; }
+    .subject { color: var(--muted); overflow-wrap: anywhere; }
+    .badge {
+      background: var(--warn-bg);
+      color: var(--warn-text);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .why { margin: 8px 0; font-size: 13px; color: var(--muted); }
+    .draft {
+      margin: 8px 0 0;
+      padding: 12px 14px;
+      background: var(--draft-bg);
+      border-radius: 8px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .no-reply { font-style: italic; color: var(--muted); }
+    details { margin-top: 10px; font-size: 14px; }
+    summary { cursor: pointer; color: var(--muted); }
+    details pre {
+      margin: 8px 0 0;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font: inherit;
+      color: var(--muted);
+    }
+    .failed .card { border-color: var(--error); }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Inbox Helper</h1>
+    <p class="subtitle">Upload candidate messages. Each one is grouped by what the person wants and gets a draft reply for a human to review. Nothing is sent.</p>
+
+    <section class="panel">
+      <form class="upload" id="upload-form">
+        <input type="file" id="file" accept=".txt,text/plain" required>
+        <button type="submit" id="process">Process</button>
+      </form>
+      <p class="hint">A .txt file with up to 30 messages separated by a line of <code>---</code>. Start each message with a <code>From:</code> line and an optional <code>Subject:</code> line. <button type="button" class="link" id="sample">Download sample</button></p>
+    </section>
+
+    <div class="status" id="status" hidden></div>
+    <section id="results"></section>
+  </main>
+
+  <script>
+    // Where the backend lives. Empty means "the same server that served this page" (local use).
+    // When the page is hosted separately (e.g. on Netlify), set this to the backend's URL.
+    const API_BASE = "";
+
+    const GROUP_LABELS = {
+      scheduling: "Scheduling",
+      application_status: "Application status",
+      offer_and_salary: "Offer & salary",
+      withdrawal: "Withdrawal",
+      documents: "Documents",
+      general_question: "General questions",
+      not_a_candidate: "Not a candidate",
+    };
+
+    const SAMPLE = `From: Priya Nair <priya.nair@example.com>
+Subject: Interview time
+
+Hi, Tuesday at 10am clashes with my current job. Would Wednesday afternoon work instead?
+
+Thanks,
+Priya
+
+---
+From: tom.becker@example.com
+Subject: any update?
+
+hey i applied for the data analyst job 3 weeks ago and havent heard back. is my application still being looked at?
+
+---
+From: Aisha Bello <aisha.bello@example.com>
+Subject: Re: Offer
+
+Thank you for the offer! Before I sign, could we discuss the base salary?
+
+Best,
+Aisha
+--
+Aisha Bello | Product Designer
+
+---
+From: Carmen Ruiz <carmen.ruiz@example.com>
+Subject: Entrevista
+
+Hola, ¿es posible hacer la entrevista por videollamada? Vivo en otra ciudad.
+`;
+
+    document.getElementById("sample").addEventListener("click", () => {
+      const url = URL.createObjectURL(new Blob([SAMPLE], { type: "text/plain" }));
+      const link = el("a");
+      link.href = url;
+      link.download = "sample-messages.txt";
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+
+    const form = document.getElementById("upload-form");
+    const fileInput = document.getElementById("file");
+    const button = document.getElementById("process");
+    const statusEl = document.getElementById("status");
+    const resultsEl = document.getElementById("results");
+
+    // Builds an element. Text is always set with textContent, never as HTML,
+    // so candidate or AI text can't inject code into the page.
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined) node.textContent = text;
+      return node;
+    }
+
+    function showStatus(text, { loading = false, error = false } = {}) {
+      statusEl.hidden = false;
+      statusEl.className = error ? "status error" : "status";
+      statusEl.replaceChildren();
+      if (loading) statusEl.append(el("div", "spinner"));
+      statusEl.append(el("span", "", text));
+    }
+
+    function renderCard(item, failed) {
+      const card = el("article", "panel card");
+
+      const head = el("div", "card-head");
+      head.append(el("span", "sender", item.from), el("span", "subject", item.subject || "(no subject)"));
+      if (item.suspicious) head.append(el("span", "badge", "⚠️ Suspicious: check before replying"));
+      card.append(head);
+
+      if (failed) {
+        card.append(el("p", "why", "Error: " + item.error));
+      } else {
+        card.append(el("p", "why", "Why: " + item.reason));
+        card.append(item.draft ? el("div", "draft", item.draft) : el("div", "draft no-reply", "No reply drafted."));
+      }
+
+      const details = el("details");
+      details.append(el("summary", "", "Original message"), el("pre", "", item.body || "(empty message)"));
+      card.append(details);
+      return card;
+    }
+
+    function renderResults({ drafts, failed }) {
+      resultsEl.replaceChildren();
+      const flagged = drafts.filter((d) => d.suspicious).length;
+      resultsEl.append(
+        el("p", "summary", `${drafts.length} drafted · ${failed.length} failed · ${flagged} flagged suspicious`),
+      );
+
+      // Drafts arrive already in group order; keep that order.
+      const groups = new Map();
+      for (const d of drafts) {
+        if (!groups.has(d.group)) groups.set(d.group, []);
+        groups.get(d.group).push(d);
+      }
+      for (const [group, items] of groups) {
+        const section = el("section", "group");
+        const heading = el("h2", "", GROUP_LABELS[group] || group);
+        heading.append(el("span", "count", String(items.length)));
+        section.append(heading, ...items.map((d) => renderCard(d, false)));
+        resultsEl.append(section);
+      }
+
+      if (failed.length > 0) {
+        const section = el("section", "group failed");
+        const heading = el("h2", "", "Failed");
+        heading.append(el("span", "count", String(failed.length)));
+        section.append(heading, ...failed.map((f) => renderCard(f, true)));
+        resultsEl.append(section);
+      }
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      button.disabled = true;
+      resultsEl.replaceChildren();
+      const started = Date.now();
+      const tick = () => showStatus(`Processing ${file.name}… ${Math.round((Date.now() - started) / 1000)}s (about 2–3 seconds per message)`, { loading: true });
+      tick();
+      const timer = setInterval(tick, 1000);
+
+      try {
+        const res = await fetch(`${API_BASE}/api/process`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: await file.text() }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `Server error ${res.status}`);
+        clearInterval(timer);
+        showStatus(`Done in ${Math.round((Date.now() - started) / 1000)}s. Review every draft before sending.`);
+        renderResults(data);
+      } catch (err) {
+        clearInterval(timer);
+        showStatus(`Could not process the file: ${err.message}`, { error: true });
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

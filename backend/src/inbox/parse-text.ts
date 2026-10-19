@@ -1,4 +1,4 @@
-import type { Message } from "./types.js";
+import type { Message } from "../types.js";
 
 // A line made only of 3 or more dashes separates messages.
 // "-----Original Message-----" and a "--" signature line don't count.

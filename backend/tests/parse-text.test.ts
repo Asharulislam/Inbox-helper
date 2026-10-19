@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { parseTextMessages } from "../src/parse-text.js";
+import { parseTextMessages } from "../src/inbox/parse-text.js";
 
 test("splits messages on --- and reads From and Subject", () => {
   const messages = parseTextMessages("From: Ann <ann@example.com>\nSubject: Hi\n\nHello there\n---\nFrom: Bob\nSecond message");

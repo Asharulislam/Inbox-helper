@@ -2,15 +2,14 @@
   "name": "inbox-helper",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/src/index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "start": "node dist/src/index.js",
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test-key": "tsx src/test-key.ts",
     "test": "node --import tsx --test tests/*.test.ts",
-    "inbox": "tsx src/index.ts"
+    "inbox": "tsx src/cli.ts",
+    "server": "tsx src/server.ts"
   },
   "keywords": [],
   "author": "",

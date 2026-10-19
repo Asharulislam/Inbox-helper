@@ -1,15 +1,17 @@
 import { readFile } from "node:fs/promises";
-import { z } from "zod";
 import { parseTextMessages } from "./parse-text.js";
-import { GROUPS, MessageSchema, type Group, type Message, type Result, type Triage } from "./types.js";
+import { GROUPS, type Group, type Message, type Result, type Triage } from "../types.js";
+import { validateInbox } from "./validate.js";
 
 export type TriageFn = (message: Message) => Promise<Triage>;
 
-// .txt files use the plain-text format (see parse-text.ts); anything else is read as JSON.
+// Reads a .txt messages file (see parse-text.ts) and runs the same checks as the upload page.
 export async function loadMessages(path: string): Promise<Message[]> {
-  const raw = await readFile(path, "utf8");
-  if (path.toLowerCase().endsWith(".txt")) return parseTextMessages(raw);
-  return z.array(MessageSchema).parse(JSON.parse(raw));
+  const text = await readFile(path, "utf8");
+  const messages = parseTextMessages(text);
+  const problem = validateInbox(text, messages);
+  if (problem) throw new Error(problem);
+  return messages;
 }
 
 // Processes messages one at a time. A failed message is recorded as an error
