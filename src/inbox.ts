@@ -1,11 +1,14 @@
 import { readFile } from "node:fs/promises";
 import { z } from "zod";
+import { parseTextMessages } from "./parse-text.js";
 import { GROUPS, MessageSchema, type Group, type Message, type Result, type Triage } from "./types.js";
 
 export type TriageFn = (message: Message) => Promise<Triage>;
 
+// .txt files use the plain-text format (see parse-text.ts); anything else is read as JSON.
 export async function loadMessages(path: string): Promise<Message[]> {
   const raw = await readFile(path, "utf8");
+  if (path.toLowerCase().endsWith(".txt")) return parseTextMessages(raw);
   return z.array(MessageSchema).parse(JSON.parse(raw));
 }
 
