@@ -1,8 +1,8 @@
-# Day 4 — YYYY-MM-DD
+# Day 4 — 2026-10-19
 
 ## Goal for today
 
-<!-- One or two sentences. -->
+Build the human review step: approve, edit or reject each draft before anything is sent.
 
 ## What I did
 
