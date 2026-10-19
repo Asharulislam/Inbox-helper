@@ -44,5 +44,5 @@ test("accepts words in other languages", () => {
 });
 
 test("accepts the sample inbox.txt", async () => {
-  assert.equal(check(await readFile("data/inbox.txt", "utf8")), null);
+  assert.equal(check(await readFile("../data/inbox.txt", "utf8")), null);
 });

@@ -39,6 +39,4 @@ Build the human review step: approve, edit or reject each draft before anything 
 - **What I did instead:** re-ran both files (20 normal messages + 8 attacks) after every change and compared the results with the previous run, message by message.
 - **What happened:** a07 (the phishing-link message) got a different decision on a re-run, even though none of my changes were about links: it went from `general_question` with a neutral reply to `not_a_candidate` with no reply. With AI, the same input doesn't always give the same output, so one good run doesn't prove the behaviour is stable.
 
-## Plan for Day 5
 
--

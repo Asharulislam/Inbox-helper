@@ -57,9 +57,9 @@ test("loadMessages rejects a file that isn't a messages file", async () => {
 });
 
 test("loadMessages reads every sample file", async () => {
-  assert.equal((await loadMessages("data/messages.txt")).length, 20);
-  assert.equal((await loadMessages("data/attacks.txt")).length, 8);
-  assert.equal((await loadMessages("data/inbox.txt")).length, 24);
+  assert.equal((await loadMessages("../data/messages.txt")).length, 20);
+  assert.equal((await loadMessages("../data/attacks.txt")).length, 8);
+  assert.equal((await loadMessages("../data/inbox.txt")).length, 24);
 });
 
 test("formatMessage wraps the message in tags and marks empty fields", () => {
