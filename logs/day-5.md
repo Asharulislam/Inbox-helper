@@ -57,5 +57,6 @@ Tests: 23/23 pass. Type check passes.
 
 - Final deliverables: `directive.md` (final version), `unlearning.md`, the Loom video and the 5-minute demo.
 - Review step in the UI: approve, edit or reject each draft, with approval blocked while a `[PLACEHOLDER]` is left.
+- Sending approved replies. The simplest safe option is an "Open in email" button (a `mailto:` link) that opens the reviewer's own email app with the draft filled in, so a human still presses Send. SMTP or an email API (Resend, SendGrid) would need the review step first, credentials as secrets and protection against spam.
 - Cost protection for the live demo (per-IP limit, global daily cap) if it stays public.
 - Measure run-to-run variation: run the same files several times and count how often decisions change.
